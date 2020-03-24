@@ -4,7 +4,28 @@ class CompaniesController < ApplicationController
   # GET /companies
   # GET /companies.json
   def index
-    @companies = Company.all
+    # @companies = Company.all
+
+    @filterrific = initialize_filterrific(
+        Company,
+        params[:filterrific],
+        select_options: {
+            sorted_by: Company.options_for_sorted_by,
+            with_category_is: Category.options_for_select,
+            with_delivery_is: Delivery.options_for_select,
+        },
+        persistence_id: "shared_key",
+        default_filter_params: {},
+        available_filters: [:sorted_by, :with_category_is, :with_delivery_is, :search_query],
+        sanitize_params: true,
+        ) || return
+
+    @companies = @filterrific.find.paginate(per_page: 10, page: params[:page])
+
+  rescue ActiveRecord::RecordNotFound => e
+    # There is an issue with the persisted param_set. Reset it.
+    puts "Had to reset filterrific params: #{e.message}"
+    redirect_to(reset_filterrific_url(format: :html)) && return
   end
 
   # GET /companies/1
@@ -62,13 +83,17 @@ class CompaniesController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_company
-      @company = Company.find(params[:id])
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_company
+    @company = Company.find(params[:id])
+  end
 
-    # Only allow a list of trusted parameters through.
-    def company_params
-      params.require(:company).permit(:name, :description, :phone, :url)
-    end
+  # Only allow a list of trusted parameters through.
+  def company_params
+    params.require(:company).permit(:name, :description, :phone, :url)
+  end
+
+  def battle_params
+    params.require(:company).permit(:name, :loser_score, :winner_id, :loser_id)
+  end
 end

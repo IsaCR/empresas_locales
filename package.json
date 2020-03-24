@@ -1,5 +1,7 @@
 {
   "name": "empresas_locales_5_2",
   "private": true,
-  "dependencies": {}
+  "dependencies": {
+    "jquery": "^3.4.1"
+  }
 }

@@ -1,0 +1,42 @@
+.pb-2.mt-5.mb-5.border-bottom
+  .row
+    .h1.col-md-11
+      Companies
+    .col-md-1
+      = link_to 'Home', companies_path, :style => 'display: inline-block; margin-top: 25px;'
+
+.card.card-body.bg-light
+  - puts @filterrific.inspect
+  = form_for_filterrific @filterrific do |f|
+    .row
+      .col-md-3
+        .form-group
+          %label.font-weight-bold Search
+          = f.text_field :search_query,
+                         :class => 'filterrific-periodically-observed form-control'
+      .col-md-3
+        .form-group
+          %label.font-weight-bold Category
+          = f.select :with_category_is,
+                     @filterrific.select_options[:with_category_is],
+                     { :include_blank => '- Any -' },
+                     { :class => 'form-control' }
+      .col-md-3
+        .form-group
+          %label.font-weight-bold Delivery
+          = f.select :with_delivery_is,
+                     @filterrific.select_options[:with_delivery_is],
+                     { :include_blank => '- Any -' },
+                     { :class => 'form-control' }
+
+      .col-md-3
+        .form-group
+          %label.font-weight-bold Sorted by
+          = f.select :sorted_by,
+                     @filterrific.select_options[:sorted_by],
+                     {},
+                     { :class => 'form-control' }
+
+#results
+  = render :partial => 'list',
+           :locals => { :companies => @companies }
